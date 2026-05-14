@@ -1,0 +1,93 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B9D;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#C06FF5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6366F1;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="body" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="head" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#34D399;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0%" style="stop-color:#FCD34D;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#F59E0B;stop-opacity:0" />
+    </radialGradient>
+    <filter id="shadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+      <feOffset dx="0" dy="4" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="110" fill="url(#bg)"/>
+  
+  <!-- Magical particles -->
+  <circle cx="100" cy="100" r="8" fill="#FCD34D" opacity="0.7"/>
+  <circle cx="400" cy="120" r="6" fill="#FDE047" opacity="0.8"/>
+  <circle cx="80" cy="400" r="10" fill="#FDE68A" opacity="0.6"/>
+  <circle cx="420" cy="380" r="7" fill="#FEF3C7" opacity="0.7"/>
+  <circle cx="200" cy="80" r="5" fill="#FBBF24" opacity="0.8"/>
+  <circle cx="380" cy="450" r="9" fill="#F59E0B" opacity="0.6"/>
+  
+  <!-- Glow behind worm -->
+  <ellipse cx="256" cy="280" rx="140" ry="100" fill="url(#glow)"/>
+  
+  <!-- Worm body segments -->
+  <g filter="url(#shadow)">
+    <!-- Tail segment -->
+    <ellipse cx="370" cy="350" rx="32" ry="28" fill="url(#body)" stroke="#047857" stroke-width="3"/>
+    
+    <!-- Body segments -->
+    <ellipse cx="330" cy="320" rx="36" ry="32" fill="url(#body)" stroke="#047857" stroke-width="3"/>
+    <ellipse cx="285" cy="295" rx="38" ry="34" fill="url(#body)" stroke="#047857" stroke-width="3"/>
+    <ellipse cx="235" cy="280" rx="40" ry="36" fill="url(#body)" stroke="#047857" stroke-width="3"/>
+    <ellipse cx="185" cy="275" rx="42" ry="38" fill="url(#body)" stroke="#047857" stroke-width="3"/>
+    <ellipse cx="135" cy="285" rx="44" ry="40" fill="url(#body)" stroke="#047857" stroke-width="3"/>
+    
+    <!-- Head -->
+    <ellipse cx="85" cy="310" rx="48" ry="44" fill="url(#head)" stroke="#047857" stroke-width="4"/>
+    
+    <!-- Face details -->
+    <!-- Eyes -->
+    <circle cx="70" cy="300" r="12" fill="#FFF"/>
+    <circle cx="100" cy="300" r="12" fill="#FFF"/>
+    <circle cx="72" cy="298" r="7" fill="#1F2937"/>
+    <circle cx="102" cy="298" r="7" fill="#1F2937"/>
+    <circle cx="74" cy="295" r="3" fill="#FFF"/>
+    <circle cx="104" cy="295" r="3" fill="#FFF"/>
+    
+    <!-- Smile -->
+    <path d="M 70 320 Q 85 330 100 320" fill="none" stroke="#047857" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Antenna -->
+    <line x1="65" y1="280" x2="50" y2="250" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
+    <line x1="105" y1="280" x2="120" y2="250" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="50" cy="250" r="6" fill="#FCD34D"/>
+    <circle cx="120" cy="250" r="6" fill="#FCD34D"/>
+  </g>
+  
+  <!-- Segment details/highlights -->
+  <ellipse cx="370" cy="345" rx="12" ry="10" fill="#34D399" opacity="0.5"/>
+  <ellipse cx="330" cy="315" rx="14" ry="12" fill="#34D399" opacity="0.5"/>
+  <ellipse cx="285" cy="290" rx="15" ry="13" fill="#34D399" opacity="0.5"/>
+  <ellipse cx="235" cy="275" rx="16" ry="14" fill="#34D399" opacity="0.5"/>
+  <ellipse cx="185" cy="270" rx="17" ry="15" fill="#34D399" opacity="0.5"/>
+  <ellipse cx="135" cy="280" rx="18" ry="16" fill="#34D399" opacity="0.5"/>
+  
+  <!-- Sparkles -->
+  <path d="M 150 180 L 153 190 L 163 193 L 153 196 L 150 206 L 147 196 L 137 193 L 147 190 Z" fill="#FDE047"/>
+  <path d="M 350 200 L 352 207 L 359 209 L 352 211 L 350 218 L 348 211 L 341 209 L 348 207 Z" fill="#FEF3C7"/>
+  <path d="M 420 280 L 422 285 L 427 287 L 422 289 L 420 294 L 418 289 L 413 287 L 418 285 Z" fill="#FBBF24"/>
+</svg>
