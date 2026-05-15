@@ -1,115 +1,15 @@
-<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#f093fb;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="camera" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#2d3748;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1a202c;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="lens" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4a5568;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#2d3748;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="lensInner" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#63b3ed;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#4299e1;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#3182ce;stop-opacity:1" />
-    </linearGradient>
-    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
-      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
-    </radialGradient>
-    <radialGradient id="shine" cx="30%" cy="30%" r="70%">
-      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.4" />
-      <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.1" />
-      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
-    </radialGradient>
-    <filter id="shadow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
-      <feOffset dx="0" dy="4" result="offsetblur"/>
-      <feComponentTransfer>
-        <feFuncA type="linear" slope="0.3"/>
-      </feComponentTransfer>
-      <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  
-  <!-- Background -->
-  <rect width="512" height="512" fill="url(#bg)" rx="100"/>
-  
-  <!-- Atmospheric glow -->
-  <circle cx="256" cy="256" r="200" fill="url(#glow)" opacity="0.6"/>
-  
-  <!-- Sparkles -->
-  <circle cx="120" cy="120" r="4" fill="#ffffff" opacity="0.8">
-    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="390" cy="100" r="3" fill="#ffffff" opacity="0.7">
-    <animate attributeName="opacity" values="0.7;0.2;0.7" dur="3s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="410" cy="380" r="4" fill="#ffffff" opacity="0.6">
-    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.5s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="90" cy="370" r="3" fill="#ffffff" opacity="0.7">
-    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2.2s" repeatCount="indefinite"/>
-  </circle>
-  
-  <!-- Camera body -->
-  <g filter="url(#shadow)">
-    <!-- Top viewfinder bump -->
-    <path d="M 200 140 L 180 170 L 332 170 L 312 140 Z" fill="url(#camera)" opacity="0.9"/>
-    
-    <!-- Main camera body -->
-    <rect x="120" y="170" width="272" height="180" rx="20" fill="url(#camera)"/>
-    
-    <!-- Camera highlights -->
-    <rect x="120" y="170" width="272" height="60" rx="20" fill="url(#shine)" opacity="0.3"/>
-    
-    <!-- Flash -->
-    <circle cx="330" cy="210" r="16" fill="#ffd700" opacity="0.9">
-      <animate attributeName="opacity" values="0.9;0.4;0.9" dur="4s" repeatCount="indefinite"/>
-    </circle>
-    <circle cx="330" cy="210" r="12" fill="#ffed4e">
-      <animate attributeName="opacity" values="1;0.5;1" dur="4s" repeatCount="indefinite"/>
-    </circle>
-    
-    <!-- Viewfinder -->
-    <rect x="165" y="200" width="40" height="28" rx="4" fill="#1a202c" opacity="0.8"/>
-    
-    <!-- Lens outer ring -->
-    <circle cx="256" cy="270" r="85" fill="url(#lens)"/>
-    <circle cx="256" cy="270" r="75" fill="#1a202c"/>
-    
-    <!-- Lens gradient rings -->
-    <circle cx="256" cy="270" r="68" fill="url(#lensInner)" opacity="0.9"/>
-    <circle cx="256" cy="270" r="55" fill="#2d3748"/>
-    <circle cx="256" cy="270" r="48" fill="url(#lensInner)"/>
-    
-    <!-- Lens aperture effect -->
-    <circle cx="256" cy="270" r="35" fill="#1a202c" opacity="0.7"/>
-    
-    <!-- Lens reflection -->
-    <ellipse cx="240" cy="250" rx="30" ry="25" fill="#ffffff" opacity="0.25"/>
-    <ellipse cx="235" cy="245" rx="15" ry="12" fill="#ffffff" opacity="0.4"/>
-    
-    <!-- Lens shine -->
-    <path d="M 256 215 Q 290 235 280 270 Q 275 250 256 240 Z" fill="#ffffff" opacity="0.15"/>
-  </g>
-  
-  <!-- Magical particles -->
-  <circle cx="150" cy="200" r="2.5" fill="#ffd700" opacity="0.8">
-    <animate attributeName="cy" values="200;180;200" dur="3s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="370" cy="250" r="2" fill="#ff69b4" opacity="0.7">
-    <animate attributeName="cy" values="250;230;250" dur="2.5s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="140" cy="310" r="2.5" fill="#87ceeb" opacity="0.8">
-    <animate attributeName="cy" values="310;290;310" dur="2.8s" repeatCount="indefinite"/>
-  </circle>
-</svg>
+<svg id="svgMain" width="512" height="512" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" id="sStart" stop-color="#232424"></stop>
+            <stop offset="100%" id="sEnd" stop-color="#bcf41f"></stop>
+          </linearGradient>
+          <filter id="fShadow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="0.5" stdDeviation="0.8" flood-color="rgba(0,0,0,0.7)"></feDropShadow>
+          </filter>
+        </defs>
+        <rect id="elRect" x="0.5" y="0.5" width="23" height="23" rx="7.84" ry="7.84" fill="#8d8eff" stroke="#fb0909" stroke-width="1.8"></rect>
+        <circle id="elCirc" cx="12" cy="12" r="11.5" fill="#8d8eff" style="display:none"></circle>
+        <path id="elGeo" d="M15.991,4.495L15.336,8.143L18.852,6.970L16.680,9.972L20.356,10.441L17.096,12.203L20.205,14.220L16.503,14.394L18.429,17.560L15.018,16.111L15.380,19.799L12.936,17.013L11.661,20.493L10.668,16.923L8.009,19.505L8.664,15.857L5.148,17.030L7.320,14.028L3.644,13.559L6.904,11.797L3.795,9.780L7.497,9.606L5.571,6.440L8.982,7.889L8.620,4.201L11.064,6.987L12.339,3.507L13.332,7.077Z" fill="url(#g1)" style=""></path>
+        <g id="elSlot"><text x="12" y="12" dy="0.38em" text-anchor="middle" font-weight="900" font-size="6.21" fill="#FFFFFF">scp</text></g>
+      </svg>

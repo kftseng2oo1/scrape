@@ -1,9 +1,9 @@
 {
-  "name": "beauty-cam",
-  "short_name": "beauty-cam ",
-  "description": "beauty-cam",
-  "start_url": "/beauty-cam/",
-  "scope": "/beauty-cam/",
+  "name": "scrape",
+  "short_name": "scrape",
+  "description": "scrape",
+  "start_url": "/scrape/",
+  "scope": "/scrape/",
   "display": "standalone",
   "orientation": "any",
   "theme_color": "#1a73e8",
@@ -14,9 +14,9 @@
   ],
   "shortcuts": [
     {
-      "name": "開啟 beauty-cam ",
-      "short_name": "beauty-cam ",
-      "url": "/beauty-cam/",
+      "name": "開啟 scrape",
+      "short_name": "scrape",
+      "url": "/scrape/",
       "icons": [
         {
           "src": "icon-192.png",
