@@ -2,558 +2,371 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>網站爬蟲策略分析器 v2</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>✨ 美顏相機</title>
 <style>
-:root {
-  --bg: #080b10;
-  --surface: #0e1218;
-  --surface2: #141922;
-  --border: #1c2433;
-  --border2: #253044;
-  --accent: #38d9a9;
-  --accent-dim: rgba(56,217,169,0.12);
-  --accent2: #ff8c42;
-  --accent2-dim: rgba(255,140,66,0.12);
-  --accent3: #a78bfa;
-  --accent3-dim: rgba(167,139,250,0.12);
-  --red: #ff5c5c;
-  --text: #dde4f0;
-  --text2: #8896aa;
-  --text3: #4a5568;
-  --mono: 'JetBrains Mono', monospace;
-  --sans: 'Syne', sans-serif;
-}
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&display=swap');
 
-* { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --rose: #f4a7b9;
+    --rose-dark: #e8849e;
+    --peach: #fde8ef;
+    --cream: #fff9fb;
+    --soft-gray: #b0a0a8;
+    --dark: #2a1e24;
+    --glass: rgba(255,255,255,0.18);
+    --glass-border: rgba(255,255,255,0.35);
+  }
 
-html { scroll-behavior: smooth; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  min-height: 100vh;
-  line-height: 1.6;
-}
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: linear-gradient(160deg, #fce4ec 0%, #f8bbd0 40%, #e1bee7 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-x: hidden;
+  }
 
-/* Scanline background */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.08) 2px,
-    rgba(0,0,0,0.08) 4px
-  );
-  pointer-events: none;
-  z-index: 0;
-}
+  /* Header */
+  .header {
+    width: 100%;
+    max-width: 430px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 8px;
+    z-index: 10;
+  }
+  .header-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--dark);
+    letter-spacing: 2px;
+  }
+  .header-title span { color: var(--rose-dark); }
+  .icon-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    backdrop-filter: blur(8px);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .icon-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.35); }
 
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(56,217,169,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 80% at 80% 100%, rgba(167,139,250,0.04) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
-}
+  /* Viewfinder */
+  .viewfinder-wrap {
+    width: 100%;
+    max-width: 430px;
+    padding: 0 16px;
+    position: relative;
+    margin-top: 4px;
+  }
+  .viewfinder {
+    width: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 12px 48px rgba(180,80,120,0.22), 0 2px 8px rgba(0,0,0,0.1);
+    background: #1a0f14;
+  }
+  #videoEl {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scaleX(-1); /* mirror */
+  }
+  #beautyCanvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scaleX(-1);
+  }
+  .viewfinder-overlay {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    border-radius: 28px;
+    box-shadow: inset 0 0 40px rgba(244,167,185,0.12);
+  }
+  /* Corner guides */
+  .corner { position: absolute; width: 22px; height: 22px; }
+  .corner-tl { top: 14px; left: 14px; border-top: 2px solid rgba(255,255,255,0.6); border-left: 2px solid rgba(255,255,255,0.6); border-radius: 4px 0 0 0; }
+  .corner-tr { top: 14px; right: 14px; border-top: 2px solid rgba(255,255,255,0.6); border-right: 2px solid rgba(255,255,255,0.6); border-radius: 0 4px 0 0; }
+  .corner-bl { bottom: 14px; left: 14px; border-bottom: 2px solid rgba(255,255,255,0.6); border-left: 2px solid rgba(255,255,255,0.6); border-radius: 0 0 0 4px; }
+  .corner-br { bottom: 14px; right: 14px; border-bottom: 2px solid rgba(255,255,255,0.6); border-right: 2px solid rgba(255,255,255,0.6); border-radius: 0 0 4px 0; }
 
-.wrap {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 48px 20px 80px;
-  position: relative;
-  z-index: 1;
-}
+  /* Beauty badge */
+  .beauty-badge {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    background: rgba(244,167,185,0.28);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 11px;
+    color: #fff;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
 
-/* ── Header ── */
-.hd {
-  margin-bottom: 44px;
-}
+  /* Flash animation */
+  .flash-overlay {
+    position: absolute; inset: 0;
+    background: white;
+    border-radius: 28px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.05s;
+  }
+  .flash-overlay.flash-active { opacity: 1; }
 
-.hd-eyebrow {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 10px;
-  opacity: 0.85;
-}
+  /* Beauty controls */
+  .beauty-controls {
+    width: 100%;
+    max-width: 430px;
+    padding: 14px 20px 0;
+  }
+  .beauty-label {
+    font-size: 11px;
+    color: var(--soft-gray);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .beauty-label strong { color: var(--rose-dark); font-size: 13px; }
 
-.hd h1 {
-  font-size: clamp(30px, 6vw, 52px);
-  font-weight: 800;
-  letter-spacing: -1.5px;
-  line-height: 1.05;
-  color: #eef2ff;
-}
+  /* Filter strip */
+  .filter-strip {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .filter-strip::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    flex-shrink: 0;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: var(--glass);
+    border: 1.5px solid var(--glass-border);
+    backdrop-filter: blur(8px);
+    font-size: 12px;
+    color: var(--dark);
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .filter-chip.active {
+    background: var(--rose);
+    border-color: var(--rose);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(244,167,185,0.5);
+  }
 
-.hd h1 em {
-  font-style: normal;
-  color: var(--accent);
-  -webkit-text-stroke: 0.5px var(--accent);
-}
+  /* Sliders */
+  .sliders {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .slider-name {
+    font-size: 12px;
+    color: var(--dark);
+    width: 40px;
+    flex-shrink: 0;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    flex: 1;
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(to right, var(--rose) 0%, var(--rose) var(--val, 50%), rgba(180,140,160,0.25) var(--val, 50%));
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: white;
+    border: 2.5px solid var(--rose-dark);
+    box-shadow: 0 2px 8px rgba(244,167,185,0.5);
+    cursor: pointer;
+  }
+  .slider-val {
+    font-size: 11px;
+    color: var(--soft-gray);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
 
-.hd-sub {
-  margin-top: 14px;
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text2);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
+  /* Bottom bar */
+  .bottom-bar {
+    width: 100%;
+    max-width: 430px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px 24px;
+    margin-top: 4px;
+  }
+  .thumb-preview {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: var(--glass);
+    border: 2px solid var(--glass-border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--soft-gray);
+    font-size: 20px;
+  }
+  .thumb-preview img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .thumb-preview:active { transform: scale(0.92); }
 
-.hd-sub span::before { content: '→ '; color: var(--accent); }
+  /* Shutter */
+  .shutter-btn {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 24px rgba(244,167,185,0.45), 0 0 0 5px rgba(244,167,185,0.25);
+    transition: transform 0.12s, box-shadow 0.12s;
+    position: relative;
+  }
+  .shutter-btn::after {
+    content: '';
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dark) 100%);
+    position: absolute;
+    transition: transform 0.12s;
+  }
+  .shutter-btn:active { transform: scale(0.93); box-shadow: 0 2px 12px rgba(244,167,185,0.3); }
+  .shutter-btn:active::after { transform: scale(0.92); }
 
-/* ── Cards ── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 16px;
-}
+  /* Flip camera */
+  .flip-btn {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--glass);
+    border: 1.5px solid var(--glass-border);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 22px;
+    transition: transform 0.3s;
+  }
+  .flip-btn:active { transform: rotate(180deg) scale(0.9); }
 
-.card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 13px 18px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface2);
-}
+  /* Permission screen */
+  .permission-screen {
+    position: fixed; inset: 0;
+    background: linear-gradient(160deg, #fce4ec 0%, #f8bbd0 50%, #e1bee7 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    z-index: 100;
+    padding: 32px;
+  }
+  .permission-screen.hidden { display: none; }
+  .perm-icon { font-size: 64px; }
+  .perm-title { font-size: 22px; font-weight: 500; color: var(--dark); text-align: center; }
+  .perm-desc { font-size: 14px; color: var(--soft-gray); text-align: center; line-height: 1.8; }
+  .perm-btn {
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 28px;
+    padding: 14px 40px;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(244,167,185,0.5);
+    letter-spacing: 1px;
+  }
 
-.card-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text2);
-}
-
-.tag {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 3px;
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-.tag-g { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(56,217,169,0.25); }
-.tag-o { background: var(--accent2-dim); color: var(--accent2); border: 1px solid rgba(255,140,66,0.25); }
-.tag-p { background: var(--accent3-dim); color: var(--accent3); border: 1px solid rgba(167,139,250,0.25); }
-.tag-r { background: rgba(255,92,92,0.1); color: var(--red); border: 1px solid rgba(255,92,92,0.25); }
-
-.card-body { padding: 20px; }
-
-/* ── Tabs ── */
-.tabs {
-  display: flex;
-  background: var(--bg);
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  padding: 3px;
-  gap: 2px;
-  margin-bottom: 18px;
-}
-
-.tab {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--text3);
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .2s;
-  letter-spacing: .5px;
-}
-
-.tab.on {
-  background: var(--surface2);
-  color: var(--accent);
-  border: 1px solid var(--border2);
-}
-
-/* ── Inputs ── */
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
-}
-
-.field label {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text2);
-}
-
-.inp {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 10px 14px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 12px;
-  outline: none;
-  transition: border-color .2s;
-  width: 100%;
-}
-.inp:focus { border-color: var(--accent); }
-.inp::placeholder { color: var(--text3); }
-
-textarea.inp {
-  min-height: 130px;
-  resize: vertical;
-  line-height: 1.6;
-}
-
-/* URL row */
-.url-row { display: flex; gap: 8px; }
-.url-row .inp { flex: 1; }
-
-/* ── Buttons ── */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
-}
-.btn-primary { background: var(--accent); color: #051a12; }
-.btn-primary:hover:not(:disabled) { background: #4aeabc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(56,217,169,0.25); }
-.btn-primary:disabled { opacity: .35; cursor: not-allowed; transform: none; }
-.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
-.btn-ghost:hover { color: var(--accent); border-color: var(--accent); }
-.btn-copy {
-  padding: 4px 12px;
-  background: transparent;
-  color: var(--text3);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .2s;
-}
-.btn-copy:hover { color: var(--accent); border-color: var(--accent); }
-.btn-copy.ok { color: var(--accent); border-color: var(--accent); }
-
-/* ── Note / Alert ── */
-.note {
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-family: var(--mono);
-  font-size: 11px;
-  line-height: 1.7;
-  margin-top: 12px;
-}
-.note-info { background: var(--accent3-dim); border: 1px solid rgba(167,139,250,0.2); color: var(--accent3); }
-.note-warn { background: var(--accent2-dim); border: 1px solid rgba(255,140,66,0.2); color: var(--accent2); }
-.note-err  { background: rgba(255,92,92,0.08); border: 1px solid rgba(255,92,92,0.2); color: var(--red); }
-.note-ok   { background: var(--accent-dim); border: 1px solid rgba(56,217,169,0.2); color: var(--accent); }
-
-/* ── Status / Progress ── */
-.status-row {
-  display: none;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  margin-bottom: 16px;
-  font-family: var(--mono);
-  font-size: 12px;
-}
-.status-row.show { display: flex; }
-
-.spin {
-  width: 16px; height: 16px;
-  border: 2px solid rgba(56,217,169,0.15);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: sp .7s linear infinite;
-  flex-shrink: 0;
-}
-@keyframes sp { to { transform: rotate(360deg); } }
-
-.status-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-.step {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  color: var(--text3);
-  transition: color .3s;
-}
-.step.active { color: var(--accent); }
-.step.done { color: var(--text2); }
-.step .dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--text3);
-  flex-shrink: 0;
-  transition: background .3s;
-}
-.step.active .dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-.step.done .dot { background: var(--text2); }
-
-/* Token meter */
-.token-meter {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text3);
-  margin-top: 8px;
-}
-.token-bar {
-  flex: 1;
-  height: 3px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.token-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 2px;
-  transition: width .5s;
-  width: 0%;
-}
-.token-fill.warn { background: var(--accent2); }
-.token-fill.over { background: var(--red); }
-
-/* Stream preview */
-.stream-preview {
-  display: none;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 14px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text2);
-  max-height: 120px;
-  overflow: hidden;
-  position: relative;
-  margin-top: 12px;
-  line-height: 1.7;
-}
-.stream-preview.show { display: block; }
-.stream-preview::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 40px;
-  background: linear-gradient(transparent, var(--bg));
-}
-
-/* ── Result Panel ── */
-.result { display: none; }
-.result.show { display: block; }
-
-/* Snapshot grid */
-.snap-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-.snap-cell {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  padding: 12px 14px;
-}
-.snap-cell .lbl {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 5px;
-}
-.snap-cell .val {
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 1.3;
-}
-
-/* SPA warning */
-.spa-banner {
-  display: none;
-  padding: 12px 16px;
-  background: var(--accent2-dim);
-  border: 1px solid rgba(255,140,66,0.25);
-  border-radius: 7px;
-  margin-bottom: 16px;
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--accent2);
-  line-height: 1.7;
-}
-.spa-banner.show { display: block; }
-
-/* Analysis prose */
-.prose {
-  font-size: 14px;
-  line-height: 1.85;
-  color: #b8c4d8;
-}
-.prose strong { color: var(--text); }
-.prose code {
-  background: var(--bg);
-  border: 1px solid var(--border2);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--accent3);
-}
-
-/* Code wrapper — override Prism tomorrow theme bg to match */
-.code-wrap {
-  position: relative;
-  background: #0d1117 !important;
-  border-radius: 7px;
-  overflow: hidden;
-}
-.code-wrap pre {
-  margin: 0 !important;
-  background: #0d1117 !important;
-  border-radius: 0 !important;
-  padding: 18px !important;
-  font-size: 12px !important;
-  line-height: 1.7 !important;
-  overflow-x: auto;
-  max-height: 420px;
-}
-.code-wrap pre code { background: transparent !important; font-size: 12px !important; }
-
-.copy-float {
-  position: absolute;
-  top: 10px; right: 10px;
-}
-
-/* Selectors list */
-.selectors {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-.selector-chip {
-  background: var(--bg);
-  border: 1px solid var(--border2);
-  border-radius: 4px;
-  padding: 4px 10px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--accent3);
-  cursor: pointer;
-  transition: all .2s;
-}
-.selector-chip:hover { background: var(--accent3-dim); border-color: var(--accent3); }
-
-/* Strategy list */
-.strategy-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.strategy-item {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-.strategy-num {
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--accent);
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.strategy-text {
-  font-size: 13px;
-  color: var(--text2);
-  line-height: 1.7;
-  flex: 1;
-}
-.strategy-text strong { color: var(--text); }
-
-/* Action row */
-.action-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-
-/* Worker code section always visible */
-.worker-section { margin-top: 20px; }
-
-@media (max-width: 580px) {
-  .snap-grid { grid-template-columns: 1fr 1fr; }
-  .url-row { flex-direction: column; }
-  .hd h1 { letter-spacing: -0.5px; }
-}
+  /* Captured modal */
+  .capture-modal {
+    position: fixed; inset: 0;
+    background: rgba(30,10,20,0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    padding: 32px;
+  }
+  .capture-modal.visible { opacity: 1; pointer-events: all; }
+  .capture-modal img {
+    max-width: min(90vw, 380px);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    transform: scaleX(-1);
+  }
+  .modal-actions {
+    display: flex; gap: 14px; margin-top: 22px;
+  }
+  .modal-btn {
+    padding: 12px 28px;
+    border-radius: 24px;
+    border: none;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.12s;
+    letter-spacing: 0.5px;
+  }
+  .modal-btn:active { transform: scale(0.94); }
+  .modal-btn.save {
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dark) 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(244,167,185,0.4);
+  }
+  .modal-btn.close-btn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
 </style>
 
 <!-- PWA Meta — auto-injected by PWA 打包神器 -->
 
-<meta name="description" content="提示詞網站爬文">
+<meta name="description" content="beauty-cam">
 
 
 
@@ -564,649 +377,348 @@ textarea.inp {
 <script>if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').then(function(r){console.log('[SW] registered:',r.scope)}).catch(function(e){console.warn('[SW] failed:',e)});});}</script>
 </head>
 <body>
-<div class="wrap">
+
+<!-- Permission screen -->
+<div class="permission-screen" id="permScreen">
+  <div class="perm-icon">📷</div>
+  <div class="perm-title">美顏相機</div>
+  <div class="perm-desc">需要使用您的相機<br>才能開始拍照</div>
+  <button class="perm-btn" id="startBtn">啟動相機</button>
+</div>
 
 <!-- Header -->
-<header class="hd">
-  <div class="hd-eyebrow">// scrape-advisor v2</div>
-  <h1>網站爬蟲<br><em>策略分析器</em></h1>
-  <div class="hd-sub">
-    <span>輸入網址 / 貼上 HTML</span>
-    <span>AI 分析結構與反爬機制</span>
-    <span>生成 Python + Puppeteer 完整程式碼</span>
-  </div>
-</header>
+<div class="header">
+  <div class="icon-btn">⚡</div>
+  <div class="header-title">✨ <span>美顏</span>相機</div>
+  <div class="icon-btn">⚙️</div>
+</div>
 
-<!-- Config + Input -->
-<div class="card">
-  <div class="card-head">
-    <div class="card-title"><span class="tag tag-g">CONFIG</span> Worker 端點設定</div>
+<!-- Viewfinder -->
+<div class="viewfinder-wrap">
+  <div class="viewfinder">
+    <video id="videoEl" autoplay playsinline muted></video>
+    <canvas id="beautyCanvas"></canvas>
+    <div class="viewfinder-overlay"></div>
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+    <div class="beauty-badge" id="beautyBadge">✨ 美顏 ON</div>
+    <div class="flash-overlay" id="flashOverlay"></div>
   </div>
-  <div class="card-body">
-    <div class="field">
-      <label>Cloudflare Worker URL（含 /scrape-analyze 路徑）</label>
-      <input class="inp" id="workerUrl"
-        value="https://arcar.kftseng2oo1.workers.dev/scrape-analyze"
-        placeholder="https://your-worker.workers.dev/scrape-analyze" />
+</div>
+
+<!-- Beauty controls -->
+<div class="beauty-controls">
+  <div class="beauty-label">
+    濾鏡模式
+    <strong id="activeFilterName">自然</strong>
+  </div>
+  <div class="filter-strip" id="filterStrip"></div>
+
+  <div class="sliders">
+    <div class="slider-row">
+      <span class="slider-name">磨皮</span>
+      <input type="range" id="sliderSkin" min="0" max="100" value="40">
+      <span class="slider-val" id="valSkin">40</span>
     </div>
-    <div class="note note-info">
-      ⚠ API Key 儲存在 Worker 環境變數 <code>ANTHROPIC_API_KEY</code> 中，不會暴露在前端。<br>
-      請先將右下方的 Worker 程式碼加入你的 arcar Worker，並在 Worker 設定 Secrets。
+    <div class="slider-row">
+      <span class="slider-name">美白</span>
+      <input type="range" id="sliderBright" min="0" max="100" value="30">
+      <span class="slider-val" id="valBright">30</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-name">對比</span>
+      <input type="range" id="sliderContrast" min="0" max="100" value="20">
+      <span class="slider-val" id="valContrast">20</span>
     </div>
   </div>
 </div>
 
-<div class="card">
-  <div class="card-head">
-    <div class="card-title"><span class="tag tag-g">INPUT</span> 輸入來源</div>
-  </div>
-  <div class="card-body">
-    <div class="tabs">
-      <button class="tab on" id="tabU" onclick="switchTab('url')">🌐 輸入網址</button>
-      <button class="tab" id="tabH" onclick="switchTab('html')">📋 貼上 HTML</button>
-    </div>
+<!-- Bottom bar -->
+<div class="bottom-bar">
+  <div class="thumb-preview" id="thumbPreview">🖼</div>
+  <button class="shutter-btn" id="shutterBtn" aria-label="拍照"></button>
+  <div class="flip-btn" id="flipBtn">🔄</div>
+</div>
 
-    <!-- URL -->
-    <div id="paneUrl">
-      <div class="field">
-        <label>目標網址</label>
-        <div class="url-row">
-          <input class="inp" id="urlInp" placeholder="https://example.com"
-            onkeydown="if(event.key==='Enter')go()" />
-          <button class="btn btn-primary" id="goBtn" onclick="go()">⬇ 分析</button>
-        </div>
-      </div>
-      <div class="note note-warn">
-        💡 Worker 會幫你抓取頁面（解決 CORS）。若目標是 SPA（React/Vue），會自動提示改用貼上模式。
-      </div>
-    </div>
-
-    <!-- HTML paste -->
-    <div id="paneHtml" style="display:none">
-      <div class="field">
-        <label>貼上 HTML 原始碼</label>
-        <textarea class="inp" id="htmlInp"
-          placeholder="在瀏覽器按 Ctrl+U → 全選 → 複製 → 貼到這裡&#10;&#10;也可以用開發者工具「Copy outerHTML」取得動態渲染後的 HTML"></textarea>
-      </div>
-      <div id="tokenMeter" class="token-meter">
-        <span id="tokenCount">0 tokens</span>
-        <div class="token-bar"><div class="token-fill" id="tokenFill"></div></div>
-        <span id="tokenPct">0%</span>
-        <span style="color:var(--text3)">/ ~12k limit</span>
-      </div>
-      <div style="margin-top:12px;">
-        <button class="btn btn-primary" id="htmlGoBtn" onclick="goHtml()">🔍 分析 HTML</button>
-      </div>
-    </div>
+<!-- Capture modal -->
+<div class="capture-modal" id="captureModal">
+  <img id="capturedImg" src="" alt="拍攝照片">
+  <div class="modal-actions">
+    <button class="modal-btn save" id="saveBtn">💾 儲存</button>
+    <button class="modal-btn close-btn" id="closeModalBtn">✕ 關閉</button>
   </div>
 </div>
 
-<!-- Status -->
-<div class="status-row" id="statusRow">
-  <div class="spin" id="spinIcon"></div>
-  <div class="status-steps" id="statusSteps">
-    <div class="step" id="s1"><div class="dot"></div><span id="s1t">等待中...</span></div>
-    <div class="step" id="s2"><div class="dot"></div><span id="s2t">HTML 清理與 SPA 偵測</span></div>
-    <div class="step" id="s3"><div class="dot"></div><span id="s3t">Claude AI 分析（串流中）</span></div>
-  </div>
-</div>
-<div class="stream-preview" id="streamPreview"></div>
-
-<!-- Result -->
-<div class="result" id="resultPanel">
-
-  <!-- SPA warning -->
-  <div class="spa-banner" id="spaBanner"></div>
-
-  <!-- Snapshot -->
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title"><span class="tag tag-g">SNAPSHOT</span> 網站結構快照</div>
-      <button class="btn-ghost btn" onclick="resetAll()" style="padding:6px 14px;font-size:10px;">↺ 重新分析</button>
-    </div>
-    <div class="card-body">
-      <div class="snap-grid" id="snapGrid"></div>
-      <div class="selectors" id="selectorChips"></div>
-    </div>
-  </div>
-
-  <!-- Analysis -->
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title"><span class="tag tag-g">ANALYSIS</span> 結構分析</div>
-    </div>
-    <div class="card-body">
-      <div class="prose" id="analysisDiv"></div>
-    </div>
-  </div>
-
-  <!-- Python -->
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title"><span class="tag tag-o">PYTHON</span> requests + BeautifulSoup</div>
-      <button class="btn-copy" id="cpyPy" onclick="copyCode('pyPre',this)">COPY</button>
-    </div>
-    <div class="card-body" style="padding:0">
-      <div class="code-wrap">
-        <pre><code class="language-python" id="pyPre"></code></pre>
-        <div class="copy-float">
-          <button class="btn-copy" onclick="copyCode('pyPre',this)">COPY</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Puppeteer -->
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title"><span class="tag tag-p">PUPPETEER</span> Node.js 動態爬蟲</div>
-      <button class="btn-copy" id="cpyJs" onclick="copyCode('jsPre',this)">COPY</button>
-    </div>
-    <div class="card-body" style="padding:0">
-      <div class="code-wrap">
-        <pre><code class="language-javascript" id="jsPre"></code></pre>
-        <div class="copy-float">
-          <button class="btn-copy" onclick="copyCode('jsPre',this)">COPY</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Strategy -->
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title"><span class="tag tag-g">STRATEGY</span> 選用建議與注意事項</div>
-      <button class="btn-copy" onclick="copyText('strategyDiv',this)">COPY</button>
-    </div>
-    <div class="card-body">
-      <div class="strategy-list" id="strategyDiv"></div>
-    </div>
-  </div>
-
-  <div class="action-row">
-    <button class="btn btn-ghost" onclick="resetAll()">↺ 重新分析</button>
-  </div>
-</div>
-
-<!-- Worker code (always visible) -->
-<div class="card worker-section">
-  <div class="card-head">
-    <div class="card-title"><span class="tag tag-p">WORKER</span> Cloudflare Worker — /scrape-analyze</div>
-    <button class="btn-copy" onclick="copyCode('workerPre',this)">COPY</button>
-  </div>
-  <div class="card-body">
-    <div class="note note-info" style="margin-bottom:14px;">
-      將以下程式碼加入你的 <code>arcar</code> Worker。<br>
-      並在 Worker → Settings → Variables → <strong>Secret Variables</strong> 加入 <code>ANTHROPIC_API_KEY</code>。
-    </div>
-    <div class="code-wrap">
-      <pre><code class="language-javascript" id="workerPre"></code></pre>
-      <div class="copy-float">
-        <button class="btn-copy" onclick="copyCode('workerPre',this)">COPY</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div><!-- /wrap -->
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <script>
-// ── State ───────────────────────────────────────────────────
-var mode = 'url';
+(function() {
+  'use strict';
 
-// ── Tab switch ──────────────────────────────────────────────
-function switchTab(t) {
-  mode = t;
-  document.getElementById('paneUrl').style.display = t === 'url' ? 'block' : 'none';
-  document.getElementById('paneHtml').style.display = t === 'html' ? 'block' : 'none';
-  document.getElementById('tabU').className = 'tab' + (t === 'url' ? ' on' : '');
-  document.getElementById('tabH').className = 'tab' + (t === 'html' ? ' on' : '');
-}
+  // ── State ──────────────────────────────────────────────
+  var state = {
+    stream: null,
+    facingMode: 'user',
+    beautyOn: true,
+    skin: 40,
+    bright: 30,
+    contrast: 20,
+    activeFilter: 0,
+    rafId: null,
+    lastCapture: null
+  };
 
-// ── Token meter (HTML paste mode) ───────────────────────────
-document.getElementById('htmlInp').addEventListener('input', updateTokenMeter);
-
-function updateTokenMeter() {
-  var txt = document.getElementById('htmlInp').value;
-  // Rough estimate: cleaned HTML ≈ 60% of raw, tokens ≈ chars/4
-  var est = Math.round(txt.length * 0.6 / 4);
-  var pct = Math.min(100, Math.round(est / 3000 * 100)); // 3000 tokens ≈ 12000 chars cleaned
-  document.getElementById('tokenCount').textContent = est.toLocaleString() + ' est. tokens';
-  var fill = document.getElementById('tokenFill');
-  fill.style.width = pct + '%';
-  fill.className = 'token-fill' + (pct > 90 ? ' over' : pct > 70 ? ' warn' : '');
-  document.getElementById('tokenPct').textContent = pct + '%';
-}
-
-// ── Step indicator ──────────────────────────────────────────
-function setStep(n, txt) {
-  for (var i = 1; i <= 3; i++) {
-    var el = document.getElementById('s' + i);
-    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
-  }
-  if (txt) document.getElementById('s' + n + 't').textContent = txt;
-}
-
-// ── Go (URL mode) ───────────────────────────────────────────
-function go() {
-  var url = document.getElementById('urlInp').value.trim();
-  if (!url) { alert('請輸入目標網址'); return; }
-  if (!url.match(/^https?:\/\//)) url = 'https://' + url;
-
-  var worker = document.getElementById('workerUrl').value.trim();
-  startStream({ targetUrl: url }, worker);
-}
-
-// ── Go (HTML mode) ──────────────────────────────────────────
-function goHtml() {
-  var html = document.getElementById('htmlInp').value.trim();
-  if (!html) { alert('請先貼上 HTML 原始碼'); return; }
-
-  var worker = document.getElementById('workerUrl').value.trim();
-  startStream({ html: html, sourceUrl: '（本地貼上）' }, worker);
-}
-
-// ── Stream fetch ────────────────────────────────────────────
-function startStream(payload, workerUrl) {
-  // UI reset
-  document.getElementById('resultPanel').className = 'result';
-  document.getElementById('spaBanner').className = 'spa-banner';
-  document.getElementById('streamPreview').className = 'stream-preview';
-  document.getElementById('streamPreview').textContent = '';
-
-  var statusRow = document.getElementById('statusRow');
-  statusRow.className = 'status-row show';
-  setStep(1, payload.targetUrl ? '正在透過 Worker 抓取頁面…' : '傳送 HTML 至 Worker…');
-
-  document.getElementById('goBtn') && (document.getElementById('goBtn').disabled = true);
-  document.getElementById('htmlGoBtn') && (document.getElementById('htmlGoBtn').disabled = true);
-
-  var streamBuf = '';
-  var metaData = null;
-
-  fetch(workerUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
-  .then(function(resp) {
-    if (!resp.ok) throw new Error('Worker 回應 HTTP ' + resp.status);
-    setStep(2, 'HTML 清理與 SPA 偵測…');
-
-    var reader = resp.body.getReader();
-    var dec = new TextDecoder();
-    var buf = '';
-
-    function pump() {
-      return reader.read().then(function(x) {
-        if (x.done) return;
-        buf += dec.decode(x.value, { stream: true });
-
-        var lines = buf.split('\n');
-        buf = lines.pop(); // keep incomplete line
-
-        lines.forEach(function(line) {
-          if (!line.startsWith('data: ')) return;
-          var raw = line.slice(6);
-          try {
-            var evt = JSON.parse(raw);
-
-            if (line.indexOf('event: meta') !== -1 || evt.sourceUrl !== undefined) {
-              // meta from SSE event line before data
-            }
-          } catch(e) {}
-        });
-
-        // Parse SSE properly
-        var fullBuf = lines.join('\n');
-        parseSseChunk(fullBuf);
-
-        return pump();
-      });
-    }
-
-    // Better SSE parser
-    var sseBuf = '';
-    var currentEvent = '';
-
-    function processChunk(chunk) {
-      sseBuf += chunk;
-      var parts = sseBuf.split('\n\n');
-      sseBuf = parts.pop();
-
-      parts.forEach(function(block) {
-        var evtType = '';
-        var dataStr = '';
-        block.split('\n').forEach(function(ln) {
-          if (ln.startsWith('event: ')) evtType = ln.slice(7).trim();
-          if (ln.startsWith('data: ')) dataStr = ln.slice(6).trim();
-        });
-        if (!dataStr) return;
-
-        try {
-          var d = JSON.parse(dataStr);
-          handleSseEvent(evtType, d);
-        } catch(e) {}
-      });
-    }
-
-    function parseSseChunk() {} // override with real one below
-
-    // Real streaming
-    var sseBuffer = '';
-    return reader.read().then(function process(x) {
-      if (x.done) return;
-      sseBuffer += dec.decode(x.value, { stream: true });
-
-      var blocks = sseBuffer.split('\n\n');
-      sseBuffer = blocks.pop();
-
-      blocks.forEach(function(block) {
-        var evtType = 'message';
-        var dataStr = '';
-        block.split('\n').forEach(function(ln) {
-          if (ln.startsWith('event: ')) evtType = ln.slice(7).trim();
-          if (ln.startsWith('data: ')) dataStr = ln.slice(6).trim();
-        });
-        if (!dataStr) return;
-        try { handleSseEvent(evtType, JSON.parse(dataStr)); } catch(e) {}
-      });
-
-      return reader.read().then(process);
-    });
-  })
-  .catch(function(err) {
-    statusRow.className = 'status-row show';
-    document.getElementById('s1t').textContent = '錯誤：' + err.message;
-    document.getElementById('s1').className = 'step active';
-    document.getElementById('spinIcon').style.borderTopColor = 'var(--red)';
-    document.getElementById('goBtn') && (document.getElementById('goBtn').disabled = false);
-    document.getElementById('htmlGoBtn') && (document.getElementById('htmlGoBtn').disabled = false);
-  });
-}
-
-function handleSseEvent(type, data) {
-  var preview = document.getElementById('streamPreview');
-
-  if (type === 'meta') {
-    setStep(3, 'Claude AI 分析（串流中）…');
-    preview.className = 'stream-preview show';
-
-    // SPA banner
-    if (data.isSpa && data.isSpa !== '靜態/SSR') {
-      var banner = document.getElementById('spaBanner');
-      banner.className = 'spa-banner show';
-      banner.innerHTML = '⚠ <strong>SPA 偵測：' + escH(data.isSpa) + '</strong> — ' + escH(data.spaReason || '') +
-        '<br>如果分析結果顯示 HTML 內容不足，請改用「貼上 HTML」模式：<br>' +
-        '→ 瀏覽器開啟目標網址 → F12 開發者工具 → 找到 <code>&lt;body&gt;</code> → 右鍵「Copy outerHTML」';
-    }
-
-    // Token info
-    if (data.tokenEstimate) {
-      preview.textContent = '預計送出 ~' + data.tokenEstimate + ' tokens | 清理後 ' + (data.cleanedLength || 0) + ' 字元';
-    }
-  }
-
-  if (type === 'delta') {
-    preview.textContent = preview.textContent.replace(/^預計送出.*\n?/, '');
-    preview.textContent += (data.text || '');
-    // auto-scroll preview
-    preview.scrollTop = preview.scrollHeight;
-  }
-
-  if (type === 'result') {
-    document.getElementById('statusRow').className = 'status-row';
-    preview.className = 'stream-preview';
-    document.getElementById('goBtn') && (document.getElementById('goBtn').disabled = false);
-    document.getElementById('htmlGoBtn') && (document.getElementById('htmlGoBtn').disabled = false);
-
-    if (data.parseError || !data.parsed) {
-      alert('AI 回傳格式解析失敗：' + (data.parseError || '無資料') + '\n\n原始回應：\n' + (data.raw || '').substring(0, 300));
-      return;
-    }
-    renderResult(data.parsed);
-  }
-
-  if (type === 'error') {
-    document.getElementById('s1t').textContent = 'Worker 錯誤：' + (data.error || '未知');
-    document.getElementById('spinIcon').style.borderTopColor = 'var(--red)';
-    document.getElementById('goBtn') && (document.getElementById('goBtn').disabled = false);
-    document.getElementById('htmlGoBtn') && (document.getElementById('htmlGoBtn').disabled = false);
-  }
-}
-
-// ── Render result ───────────────────────────────────────────
-function renderResult(r) {
-  var snap = r.snapshot || {};
-
-  // Snapshot grid
-  var cells = [
-    { lbl: '渲染類型', val: snap.render_type, col: 'var(--accent)' },
-    { lbl: '需要認證', val: snap.auth_required, col: 'var(--accent2)' },
-    { lbl: '反爬蟲機制', val: snap.anti_scraping, col: 'var(--red)' },
-    { lbl: '資料格式', val: snap.main_data_format, col: 'var(--accent3)' },
-    { lbl: '建議工具', val: snap.recommended_tool, col: 'var(--accent)' },
-    { lbl: '分頁方式', val: snap.pagination, col: 'var(--accent3)' },
+  var filters = [
+    { name: '自然', skin: 40, bright: 30, contrast: 20, hue: 0, sat: 1.0 },
+    { name: '粉嫩', skin: 60, bright: 50, contrast: 10, hue: 5,  sat: 1.1 },
+    { name: '清透', skin: 70, bright: 60, contrast: 15, hue: 0,  sat: 0.9 },
+    { name: '暖調', skin: 50, bright: 40, contrast: 25, hue: 15, sat: 1.15 },
+    { name: '冷白', skin: 55, bright: 55, contrast: 20, hue: -8, sat: 0.85 },
+    { name: '原圖', skin: 0,  bright: 0,  contrast: 0,  hue: 0,  sat: 1.0 }
   ];
-  document.getElementById('snapGrid').innerHTML = cells.map(function(c) {
-    return '<div class="snap-cell"><div class="lbl">' + c.lbl + '</div>' +
-      '<div class="val" style="color:' + c.col + '">' + escH(c.val || '—') + '</div></div>';
-  }).join('');
 
-  // Selector chips
-  var chips = snap.data_selectors || [];
-  document.getElementById('selectorChips').innerHTML = chips.map(function(s) {
-    return '<span class="selector-chip" title="點擊複製" onclick="navigator.clipboard.writeText(\'' + escH(s) + '\')">' + escH(s) + '</span>';
-  }).join('');
+  // ── DOM refs ────────────────────────────────────────────
+  var video       = document.getElementById('videoEl');
+  var canvas      = document.getElementById('beautyCanvas');
+  var ctx         = canvas.getContext('2d');
+  var permScreen  = document.getElementById('permScreen');
+  var startBtn    = document.getElementById('startBtn');
+  var shutterBtn  = document.getElementById('shutterBtn');
+  var flipBtn     = document.getElementById('flipBtn');
+  var flashEl     = document.getElementById('flashOverlay');
+  var thumbEl     = document.getElementById('thumbPreview');
+  var modal       = document.getElementById('captureModal');
+  var capturedImg = document.getElementById('capturedImg');
+  var saveBtn     = document.getElementById('saveBtn');
+  var closeModal  = document.getElementById('closeModalBtn');
+  var beautyBadge = document.getElementById('beautyBadge');
+  var filterStrip = document.getElementById('filterStrip');
+  var activeFilterName = document.getElementById('activeFilterName');
+  var sliders = {
+    skin:     { el: document.getElementById('sliderSkin'),     val: document.getElementById('valSkin') },
+    bright:   { el: document.getElementById('sliderBright'),   val: document.getElementById('valBright') },
+    contrast: { el: document.getElementById('sliderContrast'), val: document.getElementById('valContrast') }
+  };
 
-  // Analysis
-  document.getElementById('analysisDiv').innerHTML = mdToHtml(r.analysis || '');
+  // ── Build filter chips ──────────────────────────────────
+  filters.forEach(function(f, i) {
+    var chip = document.createElement('div');
+    chip.className = 'filter-chip' + (i === 0 ? ' active' : '');
+    chip.textContent = f.name;
+    chip.addEventListener('click', function() { applyFilterPreset(i); });
+    filterStrip.appendChild(chip);
+  });
 
-  // Python code
-  var pyEl = document.getElementById('pyPre');
-  pyEl.textContent = r.python_code || '';
-  Prism.highlightElement(pyEl);
-
-  // Puppeteer code
-  var jsEl = document.getElementById('jsPre');
-  jsEl.textContent = r.puppeteer_code || '';
-  Prism.highlightElement(jsEl);
-
-  // Strategy
-  var note = r.strategy_note || '';
-  var items = note.split(/\n?\d+[\.、]\s+/).filter(Boolean);
-  if (items.length < 3) {
-    // fallback: split by newline
-    items = note.split('\n').filter(function(l) { return l.trim(); });
+  function applyFilterPreset(idx) {
+    var f = filters[idx];
+    state.activeFilter = idx;
+    state.skin     = f.skin;
+    state.bright   = f.bright;
+    state.contrast = f.contrast;
+    sliders.skin.el.value     = f.skin;
+    sliders.bright.el.value   = f.bright;
+    sliders.contrast.el.value = f.contrast;
+    sliders.skin.val.textContent     = f.skin;
+    sliders.bright.val.textContent   = f.bright;
+    sliders.contrast.val.textContent = f.contrast;
+    updateSliderBgs();
+    activeFilterName.textContent = f.name;
+    document.querySelectorAll('.filter-chip').forEach(function(c, i) {
+      c.classList.toggle('active', i === idx);
+    });
   }
-  document.getElementById('strategyDiv').innerHTML = items.map(function(item, i) {
-    return '<div class="strategy-item">' +
-      '<div class="strategy-num">' + (i + 1) + '</div>' +
-      '<div class="strategy-text">' + mdToHtml(item.trim()) + '</div></div>';
-  }).join('');
 
-  document.getElementById('resultPanel').className = 'result show';
-  document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+  // ── Sliders ─────────────────────────────────────────────
+  function updateSliderBgs() {
+    ['skin','bright','contrast'].forEach(function(k) {
+      var el = sliders[k].el;
+      var pct = ((el.value - el.min) / (el.max - el.min) * 100).toFixed(1) + '%';
+      el.style.setProperty('--val', pct);
+    });
+  }
+  updateSliderBgs();
 
-// ── Helpers ──────────────────────────────────────────────────
-function escH(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function mdToHtml(txt) {
-  return escH(txt)
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\n/g, '<br>');
-}
-
-function copyCode(id, btn) {
-  var el = document.getElementById(id);
-  navigator.clipboard.writeText(el.textContent).then(function() {
-    btn.textContent = 'COPIED!';
-    btn.className = btn.className + ' ok';
-    setTimeout(function() {
-      btn.textContent = 'COPY';
-      btn.className = btn.className.replace(' ok','');
-    }, 2000);
+  sliders.skin.el.addEventListener('input', function() {
+    state.skin = parseInt(this.value);
+    sliders.skin.val.textContent = this.value;
+    updateSliderBgs();
   });
-}
-
-function copyText(id, btn) {
-  var el = document.getElementById(id);
-  navigator.clipboard.writeText(el.innerText).then(function() {
-    btn.textContent = 'COPIED!';
-    setTimeout(function() { btn.textContent = 'COPY'; }, 2000);
+  sliders.bright.el.addEventListener('input', function() {
+    state.bright = parseInt(this.value);
+    sliders.bright.val.textContent = this.value;
+    updateSliderBgs();
   });
-}
+  sliders.contrast.el.addEventListener('input', function() {
+    state.contrast = parseInt(this.value);
+    sliders.contrast.val.textContent = this.value;
+    updateSliderBgs();
+  });
 
-function resetAll() {
-  document.getElementById('resultPanel').className = 'result';
-  document.getElementById('statusRow').className = 'status-row';
-  document.getElementById('streamPreview').className = 'stream-preview';
-  document.getElementById('spaBanner').className = 'spa-banner';
-  document.getElementById('spinIcon').style.borderTopColor = '';
-}
+  // ── Camera ───────────────────────────────────────────────
+  function startCamera(facingMode) {
+    if (state.stream) {
+      state.stream.getTracks().forEach(function(t) { t.stop(); });
+    }
+    // iOS Safari 相容：用 ideal 容錯，避免 exact 造成 OverconstrainedError
+    // 720p (1280x720) 是 iOS 最穩定支援的解析度
+    var constraints = {
+      video: {
+        facingMode: { ideal: facingMode || 'user' },
+        width:  { ideal: 1280, max: 1920 },
+        height: { ideal: 720,  max: 1080 }
+      },
+      audio: false
+    };
+    return navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+      state.stream = stream;
+      video.srcObject = stream;
+      return new Promise(function(res) {
+        video.onloadedmetadata = res;
+        // iOS WebView 有時不觸發 onloadedmetadata，加 timeout 保底
+        setTimeout(res, 2000);
+      });
+    }).then(function() {
+      return video.play();
+    }).then(function() {
+      canvas.width  = video.videoWidth  || 1280;
+      canvas.height = video.videoHeight || 720;
+      permScreen.classList.add('hidden');
+      startRenderLoop();
+    });
+  }
 
-// ── Worker code display ──────────────────────────────────────
-document.getElementById('workerPre').textContent = [
-"// ============================================================",
-"// 加入到你的 arcar Worker 的 fetch handler 路由中",
-"// 需在 Worker Settings → Variables → Secrets 設定：",
-"//   ANTHROPIC_API_KEY = sk-ant-xxxxx",
-"// ============================================================",
-"",
-"// 在你的主 fetch handler 加入此路由判斷：",
-"// if (url.pathname === '/scrape-analyze') {",
-"//   return handleScrapeAnalyze(request, env);",
-"// }",
-"",
-"async function handleScrapeAnalyze(request, env) {",
-"  const CORS = {",
-"    'Access-Control-Allow-Origin': '*',",
-"    'Access-Control-Allow-Methods': 'POST, OPTIONS',",
-"    'Access-Control-Allow-Headers': 'Content-Type',",
-"  };",
-"  if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });",
-"  if (request.method !== 'POST') return new Response('POST only', { status: 405 });",
-"",
-"  const body = await request.json();",
-"  let rawHtml = '', sourceUrl = body.sourceUrl || '（直接貼上）', fetchStatus = null, fetchError = null;",
-"",
-"  // Step 1: 抓取目標網站（或接收前端傳來的 HTML）",
-"  if (body.html) {",
-"    rawHtml = body.html;",
-"  } else if (body.targetUrl) {",
-"    sourceUrl = body.targetUrl;",
-"    try {",
-"      const resp = await fetch(body.targetUrl, {",
-"        headers: {",
-"          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',",
-"          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',",
-"          'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8',",
-"        },",
-"        redirect: 'follow',",
-"        signal: AbortSignal.timeout(15000),",
-"      });",
-"      fetchStatus = resp.status;",
-"      rawHtml = await resp.text();",
-"    } catch (err) { fetchError = err.message; }",
-"  }",
-"",
-"  // Step 2: HTML 清理",
-"  let cleaned = rawHtml",
-"    .replace(/<script[\\s\\S]*?<\\/script>/gi, '')",
-"    .replace(/<style[\\s\\S]*?<\\/style>/gi, '')",
-"    .replace(/<svg[\\s\\S]*?<\\/svg>/gi, '<svg/>')",
-"    .replace(/data:[a-z/+]+;base64,[A-Za-z0-9+/=]{50,}/g, '[base64]')",
-"    .replace(/<!--[\\s\\S]*?-->/g, '')",
-"    .replace(/<(noscript|iframe|object|embed)[\\s\\S]*?<\\/\\1>/gi, '')",
-"    .replace(/\\s+style=\"[^\"]*\"/g, '')",
-"    .replace(/\\s{3,}/g, ' ')",
-"    .substring(0, 12000);",
-"",
-"  // SPA 偵測",
-"  const isSpa = rawHtml.length < 2000 ? '可能是SPA（HTML過短）' :",
-"    (/<div\\s+id=[\"'](app|root)[\"']\\s*>/i.test(rawHtml) && cleaned.replace(/<[^>]+>/g,'').trim().length < 500)",
-"      ? '確認是SPA' : '靜態/SSR';",
-"",
-"  // Step 3: 呼叫 Claude API（Streaming）",
-"  const systemPrompt = `你是資深爬蟲工程師，分析網頁HTML並輸出純JSON（不含markdown符號）。",
-"格式：{\"snapshot\":{\"render_type\":\"\",\"auth_required\":\"\",\"anti_scraping\":\"\",",
-"\"main_data_format\":\"\",\"recommended_tool\":\"\",\"pagination\":\"\",",
-"\"data_selectors\":[]},",
-"\"analysis\":\"\",\"python_code\":\"\",\"puppeteer_code\":\"\",\"strategy_note\":\"\"}`;",
-"",
-"  const claudeResp = await fetch('https://api.anthropic.com/v1/messages', {",
-"    method: 'POST',",
-"    headers: {",
-"      'Content-Type': 'application/json',",
-"      'x-api-key': env.ANTHROPIC_API_KEY,",
-"      'anthropic-version': '2023-06-01',",
-"    },",
-"    body: JSON.stringify({",
-"      model: 'claude-sonnet-4-20250514',",
-"      max_tokens: 4096,",
-"      stream: true,",
-"      system: systemPrompt,",
-"      messages: [{ role: 'user', content:",
-"        `網址：${sourceUrl}\\nSPA：${isSpa}\\n\\nHTML：\\n${cleaned}` }],",
-"    }),",
-"  });",
-"",
-"  // Step 4: 串流轉發給前端",
-"  const { readable, writable } = new TransformStream();",
-"  const writer = writable.getWriter();",
-"  const enc = new TextEncoder();",
-"",
-"  // 先送 metadata",
-"  writer.write(enc.encode(`event: meta\\ndata: ${JSON.stringify({",
-"    sourceUrl, fetchStatus, fetchError, isSpa,",
-"    tokenEstimate: Math.round(cleaned.length / 4),",
-"    cleanedLength: cleaned.length",
-"  })}\\n\\n`));",
-"",
-"  (async () => {",
-"    try {",
-"      let full = '';",
-"      const reader = claudeResp.body.getReader();",
-"      const dec = new TextDecoder();",
-"      while (true) {",
-"        const { done, value } = await reader.read();",
-"        if (done) break;",
-"        const chunk = dec.decode(value, { stream: true });",
-"        for (const line of chunk.split('\\n')) {",
-"          if (!line.startsWith('data: ')) continue;",
-"          try {",
-"            const e = JSON.parse(line.slice(6));",
-"            if (e.type === 'content_block_delta' && e.delta?.text) {",
-"              full += e.delta.text;",
-"              writer.write(enc.encode(`event: delta\\ndata: ${JSON.stringify({ text: e.delta.text })}\\n\\n`));",
-"            }",
-"          } catch {}",
-"        }",
-"      }",
-"      let parsed = null, parseError = null;",
-"      try { parsed = JSON.parse(full.replace(/```json|```/g,'').trim()); }",
-"      catch (e) { parseError = e.message; }",
-"      writer.write(enc.encode(`event: result\\ndata: ${JSON.stringify({ parsed, parseError, raw: full })}\\n\\n`));",
-"      writer.write(enc.encode('event: done\\ndata: {}\\n\\n'));",
-"    } catch (err) {",
-"      writer.write(enc.encode(`event: error\\ndata: ${JSON.stringify({ error: err.message })}\\n\\n`));",
-"    } finally { writer.close(); }",
-"  })();",
-"",
-"  return new Response(readable, {",
-"    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', ...CORS },",
-"  });",
-"}",
-].join('\n');
+  startBtn.addEventListener('click', function() {
+    startCamera('user').catch(function(e) {
+      alert('無法存取相機：' + e.message);
+    });
+  });
 
-// Highlight worker code
-Prism.highlightElement(document.getElementById('workerPre'));
+  flipBtn.addEventListener('click', function() {
+    state.facingMode = state.facingMode === 'user' ? 'environment' : 'user';
+    startCamera(state.facingMode).catch(function() {});
+  });
+
+  // ── 組合 ctx.filter 字串（全走 GPU 硬體加速，不碰 getImageData）──────
+  // brightness(1.0) = 原始；> 1 = 提亮
+  // contrast(1.0)   = 原始；> 1 = 增加對比
+  // saturate(1.0)   = 原始
+  // blur(Npx)       = 模糊（磨皮用）
+  // hue-rotate(Ndeg)= 色相偏移
+  function buildFilterStr(skinAmt, brightAmt, contrastAmt, sat, hue) {
+    var brightFactor   = 1 + brightAmt   * 0.006;   // 0~100 → 1.0~1.6
+    var contrastFactor = 1 + contrastAmt * 0.008;   // 0~100 → 1.0~1.8
+    var blurPx         = (skinAmt / 100 * 2.5).toFixed(1); // 0~100 → 0~2.5px
+    return [
+      'brightness(' + brightFactor.toFixed(3) + ')',
+      'contrast('   + contrastFactor.toFixed(3) + ')',
+      'saturate('   + (sat || 1).toFixed(2) + ')',
+      'hue-rotate(' + (hue || 0) + 'deg)',
+      blurPx > 0 ? 'blur(' + blurPx + 'px)' : ''
+    ].filter(Boolean).join(' ');
+  }
+
+  function renderFrame() {
+    if (!video.videoWidth) { state.rafId = requestAnimationFrame(renderFrame); return; }
+    if (canvas.width !== video.videoWidth) {
+      canvas.width  = video.videoWidth;
+      canvas.height = video.videoHeight;
+    }
+
+    var f = filters[state.activeFilter];
+
+    if (state.skin === 0 && state.bright === 0 && state.contrast === 0 && f.hue === 0 && f.sat === 1) {
+      // 原圖，完全不加濾鏡
+      ctx.filter = 'none';
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    } else if (state.skin > 0) {
+      // 磨皮：blur 層 + 清晰層 疊加，模擬 Soft-Glow 磨皮
+      // 步驟1：模糊層（模擬磨皮底）
+      ctx.filter = buildFilterStr(state.skin, state.bright, state.contrast, f.sat, f.hue);
+      ctx.globalAlpha = 1;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      // 步驟2：疊回清晰細節層，globalAlpha 控制透明度（磨皮越強，清晰層越透明）
+      ctx.filter = buildFilterStr(0, state.bright, state.contrast, f.sat, f.hue);
+      ctx.globalAlpha = 1 - state.skin / 200; // 0.5~1.0
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.filter = 'none';
+      ctx.globalAlpha = 1;
+    } else {
+      // 無磨皮，單純亮度/對比/色調（全 GPU）
+      ctx.filter = buildFilterStr(0, state.bright, state.contrast, f.sat, f.hue);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.filter = 'none';
+    }
+
+    state.rafId = requestAnimationFrame(renderFrame);
+  }
+
+  function startRenderLoop() {
+    if (state.rafId) cancelAnimationFrame(state.rafId);
+    renderFrame();
+  }
+
+  // ── Capture（同步快照）──────────────────────────────────
+  // 用 requestAnimationFrame 確保拍照前已完整渲染當前幀，
+  // 避免快門瞬間畫面與 canvas 內容不同步
+  shutterBtn.addEventListener('click', function() {
+    // 立即閃光回饋
+    flashEl.classList.add('flash-active');
+    setTimeout(function() { flashEl.classList.remove('flash-active'); }, 150);
+
+    // 下一幀渲染完再擷取，保證預覽與拍照一致
+    requestAnimationFrame(function() {
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      state.lastCapture = dataUrl;
+
+      // Thumbnail
+      thumbEl.innerHTML = '';
+      var img = document.createElement('img');
+      img.src = dataUrl;
+      thumbEl.appendChild(img);
+
+      // Show modal
+      capturedImg.src = dataUrl;
+      modal.classList.add('visible');
+    });
+  });
+
+  thumbEl.addEventListener('click', function() {
+    if (state.lastCapture) {
+      capturedImg.src = state.lastCapture;
+      modal.classList.add('visible');
+    }
+  });
+
+  closeModal.addEventListener('click', function() {
+    modal.classList.remove('visible');
+  });
+
+  saveBtn.addEventListener('click', function() {
+    if (!state.lastCapture) return;
+    var a = document.createElement('a');
+    a.href = state.lastCapture;
+    a.download = 'beauty_' + Date.now() + '.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    modal.classList.remove('visible');
+  });
+
+  // ── Beauty toggle (badge) ────────────────────────────────
+  beautyBadge.addEventListener('click', function() {
+    state.beautyOn = !state.beautyOn;
+    if (!state.beautyOn) {
+      applyFilterPreset(5); // 原圖
+      beautyBadge.textContent = '美顏 OFF';
+      beautyBadge.style.opacity = '0.5';
+    } else {
+      applyFilterPreset(0);
+      beautyBadge.textContent = '✨ 美顏 ON';
+      beautyBadge.style.opacity = '1';
+    }
+  });
+
+})();
 </script>
 </body>
 </html>
