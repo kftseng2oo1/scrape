@@ -1,24 +1,34 @@
 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#FF6B9D;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#C06FF5;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f093fb;stop-opacity:1" />
     </linearGradient>
-    <linearGradient id="body" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    <linearGradient id="camera" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d3748;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a202c;stop-opacity:1" />
     </linearGradient>
-    <linearGradient id="head" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#34D399;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
+    <linearGradient id="lens" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a5568;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2d3748;stop-opacity:1" />
     </linearGradient>
-    <radialGradient id="glow">
-      <stop offset="0%" style="stop-color:#FCD34D;stop-opacity:0.8" />
-      <stop offset="100%" style="stop-color:#F59E0B;stop-opacity:0" />
+    <linearGradient id="lensInner" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#63b3ed;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#4299e1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3182ce;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </radialGradient>
+    <radialGradient id="shine" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.4" />
+      <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
     </radialGradient>
     <filter id="shadow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
       <feOffset dx="0" dy="4" result="offsetblur"/>
       <feComponentTransfer>
         <feFuncA type="linear" slope="0.3"/>
@@ -31,63 +41,75 @@
   </defs>
   
   <!-- Background -->
-  <rect width="512" height="512" rx="110" fill="url(#bg)"/>
+  <rect width="512" height="512" fill="url(#bg)" rx="100"/>
   
-  <!-- Magical particles -->
-  <circle cx="100" cy="100" r="8" fill="#FCD34D" opacity="0.7"/>
-  <circle cx="400" cy="120" r="6" fill="#FDE047" opacity="0.8"/>
-  <circle cx="80" cy="400" r="10" fill="#FDE68A" opacity="0.6"/>
-  <circle cx="420" cy="380" r="7" fill="#FEF3C7" opacity="0.7"/>
-  <circle cx="200" cy="80" r="5" fill="#FBBF24" opacity="0.8"/>
-  <circle cx="380" cy="450" r="9" fill="#F59E0B" opacity="0.6"/>
-  
-  <!-- Glow behind worm -->
-  <ellipse cx="256" cy="280" rx="140" ry="100" fill="url(#glow)"/>
-  
-  <!-- Worm body segments -->
-  <g filter="url(#shadow)">
-    <!-- Tail segment -->
-    <ellipse cx="370" cy="350" rx="32" ry="28" fill="url(#body)" stroke="#047857" stroke-width="3"/>
-    
-    <!-- Body segments -->
-    <ellipse cx="330" cy="320" rx="36" ry="32" fill="url(#body)" stroke="#047857" stroke-width="3"/>
-    <ellipse cx="285" cy="295" rx="38" ry="34" fill="url(#body)" stroke="#047857" stroke-width="3"/>
-    <ellipse cx="235" cy="280" rx="40" ry="36" fill="url(#body)" stroke="#047857" stroke-width="3"/>
-    <ellipse cx="185" cy="275" rx="42" ry="38" fill="url(#body)" stroke="#047857" stroke-width="3"/>
-    <ellipse cx="135" cy="285" rx="44" ry="40" fill="url(#body)" stroke="#047857" stroke-width="3"/>
-    
-    <!-- Head -->
-    <ellipse cx="85" cy="310" rx="48" ry="44" fill="url(#head)" stroke="#047857" stroke-width="4"/>
-    
-    <!-- Face details -->
-    <!-- Eyes -->
-    <circle cx="70" cy="300" r="12" fill="#FFF"/>
-    <circle cx="100" cy="300" r="12" fill="#FFF"/>
-    <circle cx="72" cy="298" r="7" fill="#1F2937"/>
-    <circle cx="102" cy="298" r="7" fill="#1F2937"/>
-    <circle cx="74" cy="295" r="3" fill="#FFF"/>
-    <circle cx="104" cy="295" r="3" fill="#FFF"/>
-    
-    <!-- Smile -->
-    <path d="M 70 320 Q 85 330 100 320" fill="none" stroke="#047857" stroke-width="3" stroke-linecap="round"/>
-    
-    <!-- Antenna -->
-    <line x1="65" y1="280" x2="50" y2="250" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
-    <line x1="105" y1="280" x2="120" y2="250" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="50" cy="250" r="6" fill="#FCD34D"/>
-    <circle cx="120" cy="250" r="6" fill="#FCD34D"/>
-  </g>
-  
-  <!-- Segment details/highlights -->
-  <ellipse cx="370" cy="345" rx="12" ry="10" fill="#34D399" opacity="0.5"/>
-  <ellipse cx="330" cy="315" rx="14" ry="12" fill="#34D399" opacity="0.5"/>
-  <ellipse cx="285" cy="290" rx="15" ry="13" fill="#34D399" opacity="0.5"/>
-  <ellipse cx="235" cy="275" rx="16" ry="14" fill="#34D399" opacity="0.5"/>
-  <ellipse cx="185" cy="270" rx="17" ry="15" fill="#34D399" opacity="0.5"/>
-  <ellipse cx="135" cy="280" rx="18" ry="16" fill="#34D399" opacity="0.5"/>
+  <!-- Atmospheric glow -->
+  <circle cx="256" cy="256" r="200" fill="url(#glow)" opacity="0.6"/>
   
   <!-- Sparkles -->
-  <path d="M 150 180 L 153 190 L 163 193 L 153 196 L 150 206 L 147 196 L 137 193 L 147 190 Z" fill="#FDE047"/>
-  <path d="M 350 200 L 352 207 L 359 209 L 352 211 L 350 218 L 348 211 L 341 209 L 348 207 Z" fill="#FEF3C7"/>
-  <path d="M 420 280 L 422 285 L 427 287 L 422 289 L 420 294 L 418 289 L 413 287 L 418 285 Z" fill="#FBBF24"/>
+  <circle cx="120" cy="120" r="4" fill="#ffffff" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="390" cy="100" r="3" fill="#ffffff" opacity="0.7">
+    <animate attributeName="opacity" values="0.7;0.2;0.7" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="410" cy="380" r="4" fill="#ffffff" opacity="0.6">
+    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="90" cy="370" r="3" fill="#ffffff" opacity="0.7">
+    <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Camera body -->
+  <g filter="url(#shadow)">
+    <!-- Top viewfinder bump -->
+    <path d="M 200 140 L 180 170 L 332 170 L 312 140 Z" fill="url(#camera)" opacity="0.9"/>
+    
+    <!-- Main camera body -->
+    <rect x="120" y="170" width="272" height="180" rx="20" fill="url(#camera)"/>
+    
+    <!-- Camera highlights -->
+    <rect x="120" y="170" width="272" height="60" rx="20" fill="url(#shine)" opacity="0.3"/>
+    
+    <!-- Flash -->
+    <circle cx="330" cy="210" r="16" fill="#ffd700" opacity="0.9">
+      <animate attributeName="opacity" values="0.9;0.4;0.9" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="330" cy="210" r="12" fill="#ffed4e">
+      <animate attributeName="opacity" values="1;0.5;1" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Viewfinder -->
+    <rect x="165" y="200" width="40" height="28" rx="4" fill="#1a202c" opacity="0.8"/>
+    
+    <!-- Lens outer ring -->
+    <circle cx="256" cy="270" r="85" fill="url(#lens)"/>
+    <circle cx="256" cy="270" r="75" fill="#1a202c"/>
+    
+    <!-- Lens gradient rings -->
+    <circle cx="256" cy="270" r="68" fill="url(#lensInner)" opacity="0.9"/>
+    <circle cx="256" cy="270" r="55" fill="#2d3748"/>
+    <circle cx="256" cy="270" r="48" fill="url(#lensInner)"/>
+    
+    <!-- Lens aperture effect -->
+    <circle cx="256" cy="270" r="35" fill="#1a202c" opacity="0.7"/>
+    
+    <!-- Lens reflection -->
+    <ellipse cx="240" cy="250" rx="30" ry="25" fill="#ffffff" opacity="0.25"/>
+    <ellipse cx="235" cy="245" rx="15" ry="12" fill="#ffffff" opacity="0.4"/>
+    
+    <!-- Lens shine -->
+    <path d="M 256 215 Q 290 235 280 270 Q 275 250 256 240 Z" fill="#ffffff" opacity="0.15"/>
+  </g>
+  
+  <!-- Magical particles -->
+  <circle cx="150" cy="200" r="2.5" fill="#ffd700" opacity="0.8">
+    <animate attributeName="cy" values="200;180;200" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="370" cy="250" r="2" fill="#ff69b4" opacity="0.7">
+    <animate attributeName="cy" values="250;230;250" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="140" cy="310" r="2.5" fill="#87ceeb" opacity="0.8">
+    <animate attributeName="cy" values="310;290;310" dur="2.8s" repeatCount="indefinite"/>
+  </circle>
 </svg>
